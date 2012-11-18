@@ -68,7 +68,8 @@
                     this.$element.on({
                         focus: $.proxy(this.showWidget, this),
                         click: $.proxy(this.showWidget, this),
-                        blur: $.proxy(this.blurElement, this)
+                        blur: $.proxy(this.blurElement, this),
+                        keydown:$.proxy(this.inputKeydown, this)
                     });
                 } else {
                     this.$element.on({
@@ -94,6 +95,15 @@
             } 
 
             this.setDefaultTime(this.defaultTime);
+
+            var that = this;
+
+            $(document).on('mousedown', function (e) {
+                // Clicked outside the timepicker, hide it
+                if ($(e.target).closest('.bootstrap-timepicker').length == 0) {
+                    that.hideWidget();
+                }
+            });
         }
 
         , showWidget: function(e) {
@@ -299,6 +309,22 @@
             }
         }
 
+        , inputKeydown: function(e) {
+            switch (e.keyCode) {
+                case 0: //input
+                    break;
+                case 9: //tab
+                    this.hideWidget();
+                    break;
+                case 27: // escape
+                    this.hideWidget();
+                    break;
+                case 13: // enter
+                    this.hideWidget();
+                    break;
+            }
+        }
+
         , setValues: function(time) {
             if (this.showMeridian) {
                 var arr = time.split(' ');
@@ -432,10 +458,6 @@
         , update: function() {
             this.updateElement();
             this.updateWidget();
-            this.$element.trigger({
-					    type: 'changeTime',
-					    time: this.time
-				    });
         }
 
         , blurElement: function() {
@@ -447,7 +469,7 @@
             var time = this.getTime();
 
             this.$element.val(time).change();
-             
+
             switch (this.highlightedUnit) {
                 case 'hour':
                     this.highlightHour();
